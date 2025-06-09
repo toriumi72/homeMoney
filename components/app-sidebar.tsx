@@ -54,11 +54,6 @@ const data = {
       url: "/categories",
       icon: FolderOpen,
     },
-    {
-      title: "レポート・分析",
-      url: "/reports",
-      icon: BarChart3,
-    },
   ],
   navSecondary: [
     {

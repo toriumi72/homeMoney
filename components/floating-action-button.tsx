@@ -13,46 +13,50 @@ export function FloatingActionButton() {
   const [lastScrollY, setLastScrollY] = useState(0)
   const [showExpenseModal, setShowExpenseModal] = useState(false)
   const [showIncomeModal, setShowIncomeModal] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  // マウント状態を管理
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // スクロール時の表示/非表示制御
   useEffect(() => {
+    if (!mounted) return
+
     const controlNavbar = () => {
-      if (typeof window !== 'undefined') {
-        if (window.scrollY > lastScrollY && window.scrollY > 100) {
-          // 下にスクロール
-          setIsVisible(false)
-          setIsOpen(false)
-        } else {
-          // 上にスクロール
-          setIsVisible(true)
-        }
-        setLastScrollY(window.scrollY)
+      if (window.scrollY > lastScrollY && window.scrollY > 100) {
+        // 下にスクロール
+        setIsVisible(false)
+        setIsOpen(false)
+      } else {
+        // 上にスクロール
+        setIsVisible(true)
       }
+      setLastScrollY(window.scrollY)
     }
 
-    if (typeof window !== 'undefined') {
-      window.addEventListener('scroll', controlNavbar)
-      return () => {
-        window.removeEventListener('scroll', controlNavbar)
-      }
+    window.addEventListener('scroll', controlNavbar)
+    return () => {
+      window.removeEventListener('scroll', controlNavbar)
     }
-  }, [lastScrollY])
+  }, [lastScrollY, mounted])
 
   // ESCキーでメニューを閉じる
   useEffect(() => {
+    if (!mounted) return
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && isOpen) {
         setIsOpen(false)
       }
     }
 
-    if (typeof window !== 'undefined') {
-      window.addEventListener('keydown', handleKeyDown)
-      return () => {
-        window.removeEventListener('keydown', handleKeyDown)
-      }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isOpen])
+  }, [isOpen, mounted])
 
   const toggleMenu = () => {
     setIsOpen(!isOpen)
@@ -66,6 +70,11 @@ export function FloatingActionButton() {
   const handleExpenseModal = () => {
     setShowExpenseModal(true)
     setIsOpen(false)
+  }
+
+  // ハイドレーションエラーを防ぐため、マウント後に表示
+  if (!mounted) {
+    return null
   }
 
   return (
