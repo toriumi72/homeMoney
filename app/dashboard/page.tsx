@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
+
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
 import { 
@@ -18,16 +18,13 @@ import {
   Calendar,
   ArrowUpRight,
   ArrowDownRight,
-  Filter,
   MoreHorizontal,
   Receipt,
   Coffee,
   Car,
   ShoppingCart,
   Gamepad2,
-  Utensils,
-  ChevronDown,
-  Check
+  Utensils
 } from 'lucide-react'
 import {
   Select,
@@ -39,17 +36,29 @@ import {
 
 // デモデータを使用
 import { 
-  getCurrentMonthData, 
   formatCurrency, 
-  getMonthName, 
-  periodOptions, 
-  getPeriodData, 
   calculatePeriodComparison,
-  generateId,
+  periodOptions,
   type PeriodType 
 } from '@/lib/utils'
 import { demoExpenseRecords, demoIncomeRecords, demoCategories } from '@/data/demo-data'
 import { ChartFinancialInteractive } from '@/components/chart-financial-interactive'
+
+interface ExpenseRecord {
+  id?: string
+  category_id: string
+  amount: number
+  transaction_date: string
+  memo?: string
+}
+
+interface IncomeRecord {
+  id?: string
+  source: string
+  amount: number
+  transaction_date: string
+  memo?: string
+}
 
 export default function DashboardPage() {
   // 期間選択状態
@@ -71,22 +80,20 @@ export default function DashboardPage() {
     )
   }, [selectedPeriod])
 
-  const currentDate = new Date()
-  const currentMonth = getMonthName(currentDate.getMonth())
+
 
   // 現在期間のサマリー計算
   const totalIncome = periodData.current.totals.income
   const totalExpenses = periodData.current.totals.expenses
   const balance = periodData.current.totals.balance
-  const balancePercentage = totalIncome > 0 ? ((balance / totalIncome) * 100) : 0
 
   // 予算計算（カテゴリごと）
   const budgetData = demoCategories
     .filter(cat => cat.monthly_budget && cat.monthly_budget > 0)
     .map(category => {
       const spent = periodData.current.expenses
-        .filter((exp: any) => exp.category_id === category.id)
-        .reduce((sum: number, exp: any) => sum + exp.amount, 0)
+        .filter((exp: ExpenseRecord) => exp.category_id === category.id)
+        .reduce((sum: number, exp: ExpenseRecord) => sum + exp.amount, 0)
       const percentage = (spent / category.monthly_budget!) * 100
       return {
         ...category,
@@ -100,8 +107,8 @@ export default function DashboardPage() {
   const categoryRanking = demoCategories
     .map(category => {
       const spent = periodData.current.expenses
-        .filter((exp: any) => exp.category_id === category.id)
-        .reduce((sum: number, exp: any) => sum + exp.amount, 0)
+        .filter((exp: ExpenseRecord) => exp.category_id === category.id)
+        .reduce((sum: number, exp: ExpenseRecord) => sum + exp.amount, 0)
       return { ...category, spent }
     })
     .filter(cat => cat.spent > 0)
@@ -110,13 +117,15 @@ export default function DashboardPage() {
 
   // 最近の取引（直近10件）
   const recentTransactions = [
-    ...periodData.current.expenses.map((exp: any) => ({
+    ...periodData.current.expenses.map((exp: ExpenseRecord, index: number) => ({
       ...exp,
+      id: exp.id || `expense-${index}`,
       type: 'expense' as const,
       category: demoCategories.find(cat => cat.id === exp.category_id)
     })),
-    ...periodData.current.income.map((inc: any) => ({
+    ...periodData.current.income.map((inc: IncomeRecord, index: number) => ({
       ...inc,
+      id: inc.id || `income-${index}`,
       type: 'income' as const,
       category_id: 'income',
       category: { name: inc.source, icon: 'Wallet', color: 'green' }
@@ -130,7 +139,7 @@ export default function DashboardPage() {
 
   // アイコンマッピング関数
   const getIconComponent = (iconName: string) => {
-    const iconMap: { [key: string]: React.ComponentType<any> } = {
+    const iconMap: { [key: string]: React.ComponentType<{ className?: string }> } = {
       Coffee,
       Car,
       ShoppingCart,
@@ -165,7 +174,7 @@ export default function DashboardPage() {
       setQuickAmount('')
       setSelectedCategoryId(null)
       
-    } catch (error) {
+    } catch {
       toast.error("支出の登録に失敗しました")
     } finally {
       setLoading(false)
@@ -406,13 +415,13 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {categoryRanking.map((category, index) => {
+                    {categoryRanking.map((category) => {
                       const percentage = totalExpenses > 0 ? (category.spent / totalExpenses) * 100 : 0
                       return (
                         <div key={category.id} className="flex items-center gap-4">
                           <div className="flex items-center gap-3 flex-1">
                             <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 text-sm font-bold">
-                              {index + 1}
+                              {categoryRanking.indexOf(category) + 1}
                             </div>
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center bg-${category.color}-100`}>
                               <Utensils className="h-4 w-4" />
@@ -490,7 +499,7 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {recentTransactions.map((transaction, index) => (
+                  {recentTransactions.map((transaction) => (
                     <div key={`${transaction.type}-${transaction.id}`} className="flex items-center gap-4 p-3 rounded-lg border">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                         transaction.type === 'income' ? 'bg-green-100' : 'bg-red-100'

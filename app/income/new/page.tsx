@@ -6,13 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+
 import {
   ArrowLeft,
   Calendar,
@@ -175,7 +169,7 @@ export default function NewIncomePage() {
       // 成功時は一覧ページに戻る
       window.location.href = '/income'
       
-    } catch (error) {
+    } catch {
       setErrors({ submit: '保存中にエラーが発生しました' })
     } finally {
       setIsSubmitting(false)

@@ -225,8 +225,8 @@ export function getDataByPeriod(periodType: PeriodType) {
 // 期間データ取得（支出・収入）
 export function getPeriodData(
   periodType: PeriodType, 
-  allExpenses: any[],
-  allIncome: any[]
+  allExpenses: ExpenseRecord[],
+  allIncome: IncomeRecord[]
 ) {
   const { startDate, endDate } = getDataByPeriod(periodType)
   
@@ -246,13 +246,13 @@ export function getPeriodData(
     period: {
       startDate,
       endDate,
-      label: getPeriodLabel(periodType, startDate, endDate)
+      label: getPeriodLabel(periodType, startDate)
     }
   }
 }
 
 // 期間ラベル生成
-export function getPeriodLabel(periodType: PeriodType, startDate: Date, endDate: Date): string {
+export function getPeriodLabel(periodType: PeriodType, startDate: Date): string {
   switch (periodType) {
     case 'current_month':
       return `${startDate.getFullYear()}年${startDate.getMonth() + 1}月`
@@ -270,8 +270,8 @@ export function getPeriodLabel(periodType: PeriodType, startDate: Date, endDate:
 // 前期間との比較計算
 export function calculatePeriodComparison(
   currentPeriodType: PeriodType,
-  allExpenses: any[],
-  allIncome: any[]
+  allExpenses: ExpenseRecord[],
+  allIncome: IncomeRecord[]
 ) {
   const currentData = getPeriodData(currentPeriodType, allExpenses, allIncome)
   
@@ -326,7 +326,7 @@ export function calculatePeriodComparison(
 }
 
 // 月別データの取得（チャート用）
-export function getMonthlyData(allExpenses: any[], allIncome: any[], yearCount: number = 12) {
+export function getMonthlyData(allExpenses: ExpenseRecord[], allIncome: IncomeRecord[], yearCount: number = 12) {
   const months = []
   const now = new Date()
   

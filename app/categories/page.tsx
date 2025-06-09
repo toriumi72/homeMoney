@@ -3,7 +3,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import {
   Select,
@@ -21,14 +20,11 @@ import {
 import {
   Plus,
   Search,
-  Filter,
   ArrowUpDown,
   MoreVertical,
   Edit,
   Trash2,
   FolderOpen,
-  TrendingDown,
-  TrendingUp,
   Utensils,
   Car,
   Gamepad2,
@@ -82,8 +78,7 @@ export default function CategoriesPage() {
   const [sortField, setSortField] = useState<SortField>('sort_order')
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
 
-  // フィルター展開状態
-  const [isFilterExpanded, setIsFilterExpanded] = useState(false)
+
 
   // モーダル状態
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
@@ -135,13 +130,16 @@ export default function CategoriesPage() {
 
     // ソート適用
     result.sort((a, b) => {
-      let aValue: any = a[sortField]
-      let bValue: any = b[sortField]
+      let aValue: string | number | undefined = a[sortField]
+      let bValue: string | number | undefined = b[sortField]
 
       if (sortField === 'monthly_budget') {
         aValue = aValue || 0
         bValue = bValue || 0
       }
+
+      if (aValue === undefined) aValue = ''
+      if (bValue === undefined) bValue = ''
 
       if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1
       if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1
