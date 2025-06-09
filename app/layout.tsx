@@ -44,7 +44,7 @@ import {
 } from "@/components/ui/sidebar"
 import "./globals.css";
 
-import data from "./dashboard/data.json"
+
 
 export default function RootLayout({
   children,

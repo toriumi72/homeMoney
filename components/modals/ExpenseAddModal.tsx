@@ -192,7 +192,7 @@ export function ExpenseAddModal({ isOpen, onClose, onSuccess }: ExpenseAddModalP
       // モーダルを閉じる
       onClose()
       
-    } catch (error) {
+    } catch {
       setErrors({ submit: '保存中にエラーが発生しました' })
     } finally {
       setIsSubmitting(false)

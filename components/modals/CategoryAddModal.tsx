@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
+
 import {
   Dialog,
   DialogContent,
@@ -151,6 +151,7 @@ export default function CategoryAddModal({ isOpen, onClose, onSuccess }: Categor
     // 新しいカテゴリデータを作成
     const newCategory: Category = {
       id: `cat_${Date.now()}`,
+      user_id: 'demo-user-123', // デモ用のユーザーID
       name: formData.name.trim(),
       icon: formData.icon,
       color: formData.color,

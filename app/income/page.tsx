@@ -29,10 +29,8 @@ import {
   Trash2,
   Wallet,
 } from 'lucide-react'
-import Link from 'next/link'
-
 // デモデータとユーティリティをインポート
-import { demoIncomeRecords, demoCategories } from '@/data/demo-data'
+import { demoIncomeRecords } from '@/data/demo-data'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { DatePicker } from '@/components/ui/date-picker'
 import type { IncomeRecord } from '@/types'
@@ -120,8 +118,8 @@ export default function IncomePage() {
 
     // ソート適用
     result.sort((a, b) => {
-      let aValue: any = a[sortField]
-      let bValue: any = b[sortField]
+      let aValue: string | number = a[sortField]
+      let bValue: string | number = b[sortField]
 
       if (sortField === 'amount') {
         aValue = Number(aValue)

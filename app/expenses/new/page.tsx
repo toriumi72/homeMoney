@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -21,7 +21,6 @@ import {
   Calendar,
   Tag,
   FileText,
-  Camera,
   Save,
   AlertCircle
 } from 'lucide-react'
@@ -54,7 +53,7 @@ export default function NewExpensePage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // 入力値変更ハンドラー
-  const handleInputChange = (field: keyof ExpenseFormData, value: any) => {
+  const handleInputChange = (field: keyof ExpenseFormData, value: string | number) => {
     setFormData(prev => ({
       ...prev,
       [field]: value

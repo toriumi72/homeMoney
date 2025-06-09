@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useMemo } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -22,22 +22,20 @@ import {
   Plus,
   Search,
   Filter,
-  Calendar,
   MoreVertical,
   ArrowUpDown,
   Edit,
   Trash2,
   Copy,
-  Utensils
+  Utensils,
 } from 'lucide-react'
-import Link from 'next/link'
 import { Label } from '@/components/ui/label'
 
 // デモデータとユーティリティをインポート
 import { demoExpenseRecords, demoCategories } from '@/data/demo-data'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { DatePicker } from '@/components/ui/date-picker'
-import type { ExpenseRecord, Category } from '@/types'
+import type { ExpenseRecord } from '@/types'
 
 // モーダルコンポーネント
 import { ExpenseAddModal } from '@/components/modals/ExpenseAddModal'
@@ -45,7 +43,7 @@ import { ExpenseAddModal } from '@/components/modals/ExpenseAddModal'
 // フィルター条件の型
 interface ExpenseFilters {
   keyword: string
-  categoryId: string | 'all'
+  categoryId: string
   dateFrom: string
   dateTo: string
   amountMin: string
@@ -53,14 +51,14 @@ interface ExpenseFilters {
 }
 
 // ソート条件の型
-type SortField = 'transaction_date' | 'amount' | 'category_name'
+type SortField = 'transaction_date' | 'amount' | 'category_id'
 type SortOrder = 'asc' | 'desc'
 
 export default function ExpensesPage() {
   // フィルター状態
   const [filters, setFilters] = useState<ExpenseFilters>({
     keyword: '',
-    categoryId: 'all',
+    categoryId: '',
     dateFrom: '',
     dateTo: '',
     amountMin: '',
@@ -83,65 +81,47 @@ export default function ExpensesPage() {
 
   // フィルター適用されたデータ
   const filteredExpenses = useMemo(() => {
-    let filtered = [...demoExpenseRecords]
+    let result = [...demoExpenseRecords]
 
-    // キーワード検索（メモ）
+    // キーワード検索（メモで）
     if (filters.keyword) {
-      filtered = filtered.filter(expense =>
-        expense.memo?.toLowerCase().includes(filters.keyword.toLowerCase())
+      result = result.filter(expense => 
+        expense.memo && expense.memo.toLowerCase().includes(filters.keyword.toLowerCase())
       )
     }
 
     // カテゴリフィルター
-    if (filters.categoryId && filters.categoryId !== 'all') {
-      filtered = filtered.filter(expense => expense.category_id === filters.categoryId)
+    if (filters.categoryId) {
+      result = result.filter(expense => expense.category_id === filters.categoryId)
     }
 
     // 日付範囲フィルター
     if (filters.dateFrom) {
-      filtered = filtered.filter(expense => expense.transaction_date >= filters.dateFrom)
+      result = result.filter(expense => expense.transaction_date >= filters.dateFrom)
     }
     if (filters.dateTo) {
-      filtered = filtered.filter(expense => expense.transaction_date <= filters.dateTo)
+      result = result.filter(expense => expense.transaction_date <= filters.dateTo)
     }
 
     // 金額範囲フィルター
     if (filters.amountMin) {
-      filtered = filtered.filter(expense => expense.amount >= parseInt(filters.amountMin))
+      result = result.filter(expense => expense.amount >= parseInt(filters.amountMin))
     }
     if (filters.amountMax) {
-      filtered = filtered.filter(expense => expense.amount <= parseInt(filters.amountMax))
+      result = result.filter(expense => expense.amount <= parseInt(filters.amountMax))
     }
 
     // ソート適用
-    filtered.sort((a, b) => {
-      let valueA: any, valueB: any
+    result.sort((a, b) => {
+      const aValue: string | number = a[sortField]
+      const bValue: string | number = b[sortField]
 
-      switch (sortField) {
-        case 'transaction_date':
-          valueA = new Date(a.transaction_date)
-          valueB = new Date(b.transaction_date)
-          break
-        case 'amount':
-          valueA = a.amount
-          valueB = b.amount
-          break
-        case 'category_name':
-          const categoryA = demoCategories.find(cat => cat.id === a.category_id)
-          const categoryB = demoCategories.find(cat => cat.id === b.category_id)
-          valueA = categoryA?.name || ''
-          valueB = categoryB?.name || ''
-          break
-        default:
-          return 0
-      }
-
-      if (valueA < valueB) return sortOrder === 'asc' ? -1 : 1
-      if (valueA > valueB) return sortOrder === 'asc' ? 1 : -1
+      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1
+      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1
       return 0
     })
 
-    return filtered
+    return result
   }, [filters, sortField, sortOrder])
 
   // 日付変更ハンドラー
@@ -165,7 +145,7 @@ export default function ExpensesPage() {
   const resetFilters = () => {
     setFilters({
       keyword: '',
-      categoryId: 'all',
+      categoryId: '',
       dateFrom: '',
       dateTo: '',
       amountMin: '',
@@ -181,7 +161,7 @@ export default function ExpensesPage() {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
     } else {
       setSortField(field)
-      setSortOrder('desc')
+      setSortOrder('asc')
     }
   }
 
@@ -390,8 +370,8 @@ export default function ExpensesPage() {
                 <DropdownMenuItem onClick={() => handleSort('amount')}>
                   金額順 {sortField === 'amount' && (sortOrder === 'asc' ? '↑' : '↓')}
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleSort('category_name')}>
-                  カテゴリ順 {sortField === 'category_name' && (sortOrder === 'asc' ? '↑' : '↓')}
+                <DropdownMenuItem onClick={() => handleSort('category_id')}>
+                  カテゴリ順 {sortField === 'category_id' && (sortOrder === 'asc' ? '↑' : '↓')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

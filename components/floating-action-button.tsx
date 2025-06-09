@@ -1,8 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Plus, TrendingUp, TrendingDown, Wallet } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Plus, TrendingUp, TrendingDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ExpenseAddModal } from "@/components/modals/ExpenseAddModal"
 import { IncomeAddModal } from "@/components/modals/IncomeAddModal"
