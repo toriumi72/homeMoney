@@ -35,10 +35,9 @@
 // }
 
 import { AppSidebar } from "@/components/app-sidebar"
-import { ChartAreaInteractive } from "@/components/chart-area-interactive"
-import { DataTable } from "@/components/data-table"
-import { SectionCards } from "@/components/section-cards"
 import { SiteHeader } from "@/components/site-header"
+import { FloatingActionButton } from "@/components/floating-action-button"
+import { Toaster } from "@/components/ui/sonner"
 import {
   SidebarInset,
   SidebarProvider,
@@ -74,7 +73,9 @@ export default function RootLayout({
               </div>
             </div>
           </SidebarInset>
+          <FloatingActionButton />
         </SidebarProvider>
+        <Toaster />
       </body>
     </html>
   )
